@@ -3,9 +3,18 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 
 const Navbar = () => {
-  const { cartItems } = useCart();
+  // If useCart() is undefined, fall back to {} so destructuring won't crash
+  const cartContext = useCart() || {};
+  const cartItems = Array.isArray(cartContext.cartItems)
+    ? cartContext.cartItems
+    : [];
+
   const navigate = useNavigate();
-  const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
+
+  const cartCount = cartItems.reduce(
+    (sum, item) => sum + (item.qty || item.quantity || 0),
+    0
+  );
 
   const linkClass = ({ isActive }) =>
     `flex flex-col items-center gap-1 ${
@@ -27,14 +36,13 @@ const Navbar = () => {
             <p>HOME</p>
             <hr className="w-2/4 border-none h-[1.5px] bg-gray-700" />
           </NavLink>
+
           <NavLink to="/collection" className={linkClass}>
             <p>COLLECTION</p>
           </NavLink>
-          
         </ul>
 
         <div className="flex items-center gap-4 text-sm">
-         
           <button onClick={() => navigate("/cart")} className="relative">
             🛒
             {cartCount > 0 && (

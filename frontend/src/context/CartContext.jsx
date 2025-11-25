@@ -1,39 +1,54 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]); // { product, qty }
+  const [cart, setCart] = useState([]);
 
-  const addToCart = (product) => {
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.product._id === product._id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product._id === product._id
-            ? { ...item, qty: item.qty + 1 }
+  // Add product or increase quantity
+  const addToCart = (product, qty = 1) => {
+    setCart(prev => {
+      const exists = prev.find(item => item._id === product._id);
+
+      if (exists) {
+        return prev.map(item =>
+          item._id === product._id
+            ? { ...item, quantity: item.quantity + qty }
             : item
         );
       }
-      return [...prev, { product, qty: 1 }];
+      return [...prev, { ...product, quantity: qty }];
     });
   };
 
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.product._id !== id));
+  // Increase quantity
+  const increaseQty = (id) => {
+    setCart(prev =>
+      prev.map(item =>
+        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
   };
 
-  const clearCart = () => setCartItems([]);
+  // Decrease quantity
+  const decreaseQty = (id) => {
+    setCart(prev =>
+      prev.map(item =>
+        item._id === id
+          ? { ...item, quantity: Math.max(0, item.quantity - 1) }
+          : item
+      ).filter(item => item.quantity > 0)
+    );
+  };
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
-  const cartTotal = cartItems.reduce(
-    (sum, item) => sum + item.qty * item.product.price,
-    0
-  );
+  // Remove product completely
+  const removeFromCart = (id) => {
+    setCart(prev => prev.filter(item => item._id !== id));
+  };
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, clearCart, cartCount, cartTotal }}
+      value={{ cart, addToCart, increaseQty, decreaseQty, removeFromCart }}
     >
       {children}
     </CartContext.Provider>

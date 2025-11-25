@@ -9,13 +9,13 @@ const fallbackProducts = [
   {
     _id: "shirt",
     name: "top  for women",
-    price: 29,
+    price: 39,
     images: productImages.shirt,     // make sure productImages.shirt exists
   },
   {
     _id: "mensShirt",
     name: "Men’s Pure Fit Shirt",
-    price: 74,
+    price: 54,
     images: productImages.mensShirt, // make sure productImages.mensShirt exists
   },
 ];
